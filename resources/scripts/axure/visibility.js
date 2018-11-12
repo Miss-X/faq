@@ -228,13 +228,18 @@
                     wrappedOffset.top = $ax.getNumFromPx(container.css('top'));
                 }
 
-                if (options.containInner && !containerExists && (wrappedOffset.left != 0 || wrappedOffset.top != 0)) {
-                    for (i = 0; i < wrapped.length; i++) {
-                        inner = $(wrapped[i]);
-                        //if ($ax.public.fn.isCompoundVectorComponentHtml(inner[0])) break;
-                        inner.css('left', $ax.getNumFromPx(inner.css('left')) + wrappedOffset.left);
-                        inner.css('top', $ax.getNumFromPx(inner.css('top')) + wrappedOffset.top);
+                if (options.containInner && !containerExists) {
+                    if (wrappedOffset.left != 0 || wrappedOffset.top != 0) {
+                        for (i = 0; i < wrapped.length; i++) {
+                            inner = $(wrapped[i]);
+                            if (!inner.hasClass('text')) {
+                                inner.css('left', $ax.getNumFromPx(inner.css('left')) + wrappedOffset.left);
+                                inner.css('top', $ax.getNumFromPx(inner.css('top')) + wrappedOffset.top);
+                            }
+                        }
                     }
+
+                    wrapped.filter('.text').css({ 'left': '', 'top': '' });
                 }
 
                 if(options.containInner && !options.value) {
@@ -339,7 +344,8 @@
             innerContainer.css({
                 position: 'relative',
                 'width': containerWidth,
-                'height': containerHeight
+                'height': containerHeight,
+                'display': 'flex'
             });
 
             innerContainer.appendTo(container);
@@ -915,6 +921,7 @@
             position: 'absolute',
             width: width,
             height: height,
+            display: 'flex'
         };
 
         if(!containerExists) {
@@ -1035,6 +1042,9 @@
         var width = axObject.width();
         var height = axObject.height();
 
+        if (makePanelVisible) $ax.visibility.SetIdVisible(id, true);
+        for (i = 0; i < jobj.length; i++) $ax.visibility.SetVisible(jobj[i], true);
+
         for(var i = 0; i < jobj.length; i++) {
             var child = $(jobj[i]);
             var oldTop = $ax.getNumFromPx(fixAuto(child, 'top'));
@@ -1049,9 +1059,6 @@
                 child.css('top', oldTop - height + 'px');
             }
         }
-
-        if (makePanelVisible) $ax.visibility.SetIdVisible(id, true);
-        for(i = 0; i < jobj.length; i++) $ax.visibility.SetVisible(jobj[i], true);
 
         if(preserveScroll) _tryResumeScrollForDP(id);
 
